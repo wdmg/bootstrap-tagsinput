@@ -25,7 +25,7 @@
                 </div>
                 <div class="form-group">
                     <label class="control-label" for="tags">Tags:</label>
-                    <input id="tags" name="tags" class="form-control" value="aaa,bbb,ccc" />
+                    <input id="tags" name="tags" class="form-control" value="some, boo, too, foo" />
                 </div>
             </div>
         </div>
@@ -37,7 +37,20 @@
 <script src="../src/js/tagsinput.js"></script>
 <script type="text/javascript">
     $(document).ready(function () {
-        $('input#tags').tagsinput();
+
+        $('input#tags').val('{"471":"some text","472":"some value","boo":"some value 2","foo":"some value 3","foo":"some value 4","foo":"some value 5"}');
+
+        var tags = $('input#tags').tagsinput({
+            "onBeforeInsert": function () {
+                console.log(this.index);
+            }
+        });
+
+        setInterval(function() {
+            console.log(tags.tagsinput('items'));
+            console.log($('input#tags').val());
+        }, 5000);
+
     });
 </script>
 </body>

@@ -78,7 +78,6 @@
                 _this._$element.each(function() {
 
                     _this.tags = [];
-                    _this.format = "string";
                     _this.$input = $(this);
                     var $body = $('body');
 
@@ -100,49 +99,17 @@
                     });
 
                     // Get values from original input and add them
-                    var inputVal = _this.$input.val();
-                    try {
-
-                        _this.tags = {};
-                        _this.format = "json";
-
-                        var tagsList = JSON.parse(inputVal.split(_this._config.delimiter));
-                        $.each(tagsList, function(i, tag) {
-                            _this.addTag(i, tag);
-                        });
-
-                    } catch(e) {
-
-                        _this.tags = [];
-                        _this.format = "string";
-
-                        var tagsList = inputVal.split(_this._config.delimiter);
-                        if (tagsList.length > 0) {
-                            $.each(tagsList, function(i, tag) {
-                                _this.addTag(tag);
-                            });
-                        }
-                        
-                    }
-
-                    // Update input value
-                    _this.updateValues();
+                    var tagsList = _this.$input.val().split(_this._config.delimiter);
+                    tagsList.forEach(function(item, i, arr) {
+                        _this.addTag(item.trim());
+                    });
 
                     // Add tag by press enter
                     _this.$tagsInput.on('keydown', function(event) {
                         var code = event.keyCode || event.which;
                         if (code === 13 || code === 43) {
                             var value = event.target.value.trim();
-
-                            var pattern = /([_a-z]\w*):\s*([^;]*)/gi;
-                            var match = pattern.exec(value);
-                            if (match !== null) {
-                                _this.addTag(match[1], match[2]);
-                            } else {
-                                _this.addTag(value);
-                            }
-                            _this.updateValues();
-
+                            _this.addTag(value);
                             event.target.value = '';
                         }
                     });
@@ -151,10 +118,7 @@
                     _this.$tagsInput.on('focusout', function(event) {
                         var value = event.target.value.trim();
                         if (value.length > 0) {
-
-                            if (_this.addTag(value))
-                                _this.updateValues();
-
+                            _this.addTag(value);
                             event.target.value = '';
                         }
                     });
@@ -180,120 +144,90 @@
                         return _this._$element;
                     }
                 },
-                clearValues: {
-                    value: function clearValues() {
-                        // Clear tags in original input
-                        this.$input.data('tags', []);
-                        this.$input.val('');
-                    }
-                },
                 updateValues: {
                     value: function updateValues() {
 
-                        // Write tags to original input for access via input.data('tags')
-                        this.$input.data('tags', this.tags);
+                        if (this.tags.length > 0) {
 
-                        // Write values to original input for access via input.val()
-                        if (this.format == "json")
-                            this.$input.val(JSON.stringify(this.tags));
-                        else
+                            // Write tags to original input for access via input.data('tags')
+                            this.$input.data('tags', this.tags);
+
+                            // Write values to original input for access via input.val()
                             this.$input.val(this.tags.join(this._config.delimiter));
 
+                        } else {
+
+                            // Clear tags in original input
+                            this.$input.data('tags', []);
+                            this.$input.val('');
+
+                        }
                     }
                 },
                 removeTag: {
                     value: function removeTag(value) {
-                        var _this = this;
                         if (value.length > 0) {
-                            if (_this.format == "json") {
-                                $.each(this.tags, function(i, tag) {
-                                    if (tag == value)
-                                        delete _this.tags[i];
+                            var index = $.inArray(value, this.tags);
+                            if (parseInt(index) >= 0) {
+                                if (this.tags.splice(index, 1)) {
+                                    
+                                    // Callback on change input
+                                    if (!this.$input.hasClass('disabled')) {
 
-                                });
-                                _this.updateValues();
-                                return true;
-                            } else {
-                                var index = $.inArray(value, _this.tags);
-                                if (parseInt(index) >= 0) {
-                                    if (_this.tags.splice(index, 1)) {
+                                        if(this._config.debug)
+                                            console.log('Call `onChange` method', _this);
 
-                                        // Callback on change input
-                                        if (!_this.$input.hasClass('disabled')) {
-
-                                            if(_this._config.debug)
-                                                console.log('Call `onChange` method', _this);
-
-                                            _this._config.onChange.call(_this);
-                                        }
-
-                                        _this.updateValues();
-                                        return true;
+                                        this._config.onChange.call(_this);
                                     }
+
+                                    return true;
                                 }
                             }
                         }
                         return false;
                     }
                 },
-                pushLabel: {
-                    value: function pushLabel(index, value) {
-                        var $tag = this.$tagsItemTemplate.clone();
-                        var $removeLink = this.$tagsItemRemoveTemplate.clone();
-
-                        // Add tag meta data
-                        $removeLink.data('index', index);
-                        $removeLink.data('value', value);
-
-                        // Composite and add tag label to wrapper
-                        $tag.addClass(this._config.labelClass);
-                        $tag.append(value).append($removeLink);
-                        this.$tagsInput.before($tag);
-
-                        // Callback on change input
-                        if (!this.$input.hasClass('disabled')) {
-
-                            if(this._config.debug)
-                                console.log('Call `onChange` method', this);
-
-                            this._config.onChange.call(this);
-                        }
-                    }
-                },
                 addTag: {
-                    value: function addTag(index, value) {
-
-                        // If send array not object
-                        if (typeof value == "undefined") {
-                            value = index.trim();
-                            index = false;
-                        }
+                    value: function addTag(value) {
 
                         // Clear from start/end spaces
                         value = value.trim();
 
                         // If value not empty try to add them
                         if (value.length > 0) {
-                            if (this.format == "json") {
+
+                            // If value not present in tags collection
+                            if ($.inArray(value, this.tags) == -1) {
 
                                 // Push tag to tags collection
-                                if (this.tags[index.toString()] = value) {
-                                    this.pushLabel(index, value);
-                                    return index;
-                                }
+                                if (this.tags.push(value)) {
 
-                            } else {
+                                    var $tag = this.$tagsItemTemplate.clone();
+                                    var $removeLink = this.$tagsItemRemoveTemplate.clone();
+                                    $removeLink.data('value', value);
 
-                                // If value not present in tags collection
-                                if ($.inArray(value, this.tags) == -1) {
+                                    // Composite and add tag label to wrapper
+                                    $tag.addClass(this._config.labelClass);
+                                    $tag.append(value).append($removeLink);
+                                    this.$tagsInput.before($tag);
 
-                                    // Push tag to tags collection
-                                    if (index = this.tags.push(value)) {
-                                        this.pushLabel(index, value);
-                                        return index;
+                                    // Write tags to original input for access via input.data('tags')
+                                    this.$input.data('tags', this.tags);
+
+                                    // Write values to original input for access via input.val()
+                                    this.$input.val(this.tags.join(this._config.delimiter));
+
+                                    // Callback on change input
+                                    if (!this.$input.hasClass('disabled')) {
+
+                                        if(this._config.debug)
+                                            console.log('Call `onChange` method', _this);
+
+                                        this._config.onChange.call(_this);
                                     }
-                                }
 
+                                    return true;
+                                }
                             }
                         }
                         return false;
