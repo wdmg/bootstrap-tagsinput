@@ -1,0 +1,26 @@
+{
+  "name": "wdmg/bootstrap-tagsinput-plugin",
+  "description": "Tags input for Bootstrap 3",
+  "keywords": [
+    "twitter-bootstrap",
+    "bootstrap",
+    "select",
+    "dropdown"
+  ],
+  "homepage": "https://github.com/wdmg/bootstrap-tagsinput",
+  "authors": [
+    {
+      "name": "Alexsander Vyshnyvetskyy",
+      "email": "alex.vyshnyvetskyy@gmail.com"
+    },
+    {
+      "name": "W.D.M.Group, Ukraine",
+      "email": "wdmg.com.ua@gmail.com"
+    }
+  ],
+  "support": {
+    "issues": "https://github.com/wdmg/bootstrap-tagsinput/issues"
+  },
+  "license": "MIT",
+  "version": "1.0.0"
+}

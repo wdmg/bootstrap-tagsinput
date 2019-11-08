@@ -1,0 +1,33 @@
+{
+  "name": "bootstrap-tagsinput-plugin",
+  "description": "Tags input for Bootstrap 3",
+  "keywords": [
+    "twitter-bootstrap",
+    "bootstrap",
+    "tags",
+    "input"
+  ],
+  "author": "W.D.M.Group, Ukraine <wdmg.com.ua@gmail.com> (https://wdmg.com.ua/)",
+  "main": "build/tagsinput.js",
+  "dependencies": {
+    "bootstrap": "^3.3",
+    "grunt-autoprefixer": "^3.0.4",
+    "grunt-contrib-concat": "^1.0.1",
+    "grunt-contrib-cssmin": "^3.0.0",
+    "grunt-contrib-sass": "^1.0.0",
+    "grunt-contrib-uglify-es": "^3.3.0",
+    "grunt-contrib-watch": "^1.1.0",
+    "grunt-css": "^0.5.4",
+    "jquery": "^3.3.1"
+  },
+  "devDependencies": {
+    "grunt": "latest"
+  },
+  "repository": "https://github.com/wdmg/bootstrap-tagsinput.git",
+  "homepage": "http://wdmg.github.io/bootstrap-tagsinput/",
+  "bugs": {
+    "url": "https://github.com/wdmg/bootstrap-tagsinput/issues"
+  },
+  "license": "MIT",
+  "version": "1.0.0"
+}

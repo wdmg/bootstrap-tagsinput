@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Bootstrap Tags Input</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+    <link href="../src/css/tagsinput.css" rel="stylesheet">
+    <!--[if lt IE 9]>
+    <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
+    <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+</head>
+<body>
+
+<div class="container">
+    <div class="row">
+        <div class="col-md-3">&nbsp;</div>
+        <div class="col-md-6">
+            <div class="well" style="margin: 2rem 0;">
+                <div class="form-group">
+                    <label class="control-label" for="fgbf">Ffgbf:</label>
+                    <input id="fgbf" name="fghfgh" class="form-control" value="Some" />
+                </div>
+                <div class="form-group">
+                    <label class="control-label" for="tags">Tags:</label>
+                    <input id="tags" name="tags" class="form-control" value="aaa,bbb,ccc" />
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">&nbsp;</div>
+    </div>
+</div>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+<script src="../src/js/tagsinput.js"></script>
+<script type="text/javascript">
+    $(document).ready(function () {
+        $('input#tags').tagsinput();
+    });
+</script>
+</body>
+</html>
