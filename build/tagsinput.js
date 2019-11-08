@@ -152,13 +152,18 @@
                         var value = event.target.value.trim();
                         if (value.length > 0) {
 
-                            if (_this.addTag(value))
-                                _this.updateValues();
+                            var pattern = /([_a-z]\w*):\s*([^;]*)/gi;
+                            var match = pattern.exec(value);
+                            if (match !== null) {
+                                _this.addTag(match[1], match[2]);
+                            } else {
+                                _this.addTag(value);
+                            }
+                            _this.updateValues();
 
                             event.target.value = '';
                         }
                     });
-
 
                     // Remove tag
                     $body.delegate('#' + _this._tagsListId + ' [data-dismiss="tag"]', 'click', function(event) {
