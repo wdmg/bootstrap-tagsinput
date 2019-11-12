@@ -1,5 +1,6 @@
 .bootstrap-tagsinput {
   display: inline-block;
+  position: relative;
   padding: 6px 12px;
   font-size: 14px;
   vertical-align: middle;
@@ -31,10 +32,41 @@
 .bootstrap-tagsinput .tag {
   display: inline-block;
   padding: 3px 6px 5px 6px;
-  margin-right: 6px;
+  margin-right: 8px;
+  margin-top: 2px;
+  margin-bottom: 4px;
 }
 .bootstrap-tagsinput .tag > [data-dismiss] {
   text-decoration: none;
   color: inherit !important;
   margin-left: 4px;
+}
+.bootstrap-tagsinput .autocomplete {
+  position: absolute;
+  border: 1px solid #d4d4d4;
+  border-bottom: none;
+  border-top: none;
+  padding: 5px 0;
+  z-index: 99;
+  top: 100%;
+  left: 0;
+  right: 0;
+}
+.bootstrap-tagsinput .autocomplete:empty {
+  display: none !important;
+}
+.bootstrap-tagsinput .autocomplete li > .item {
+  background-color: #fff;
+  border-bottom: 1px solid #d4d4d4;
+}
+.bootstrap-tagsinput .autocomplete li > .item:hover {
+  background-color: #e9e9e9;
+}
+.bootstrap-tagsinput .autocomplete li > .item .active {
+  /*when navigating through the items using the arrow keys:*/
+  background-color: DodgerBlue !important;
+  color: #ffffff;
+}
+.bootstrap-tagsinput .autocomplete li:last-child .item {
+  border-bottom: none;
 }

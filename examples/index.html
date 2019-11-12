@@ -18,16 +18,24 @@
     <div class="row">
         <div class="col-md-3">&nbsp;</div>
         <div class="col-md-6">
-            <div class="well" style="margin: 2rem 0;">
+            <form action="" class="well" style="margin: 2rem 0;">
                 <div class="form-group">
-                    <label class="control-label" for="fgbf">Ffgbf:</label>
-                    <input id="fgbf" name="fghfgh" class="form-control" value="Some" />
+                    <label class="control-label" for="tags1">Simple tags:</label>
+                    <input id="tags1" name="tags1" class="form-control" placeholder="Type your tags here..." value="some, boo, too, foo" />
+                    <div class="help-block"></div>
                 </div>
                 <div class="form-group">
-                    <label class="control-label" for="tags">Tags:</label>
-                    <input id="tags" name="tags" class="form-control" value="some, boo, too, foo" />
+                    <label class="control-label" for="tags2">Tags with index:</label>
+                    <input id="tags2" name="tags2" class="form-control" placeholder="Type your tags here..." value="" />
+                    <div class="help-block"></div>
                 </div>
-            </div>
+                <div class="form-group">
+                    <label class="control-label" for="tags3">Tags with index and autocomplete:</label>
+                    <input id="tags3" name="tags3" class="form-control" placeholder="Type your tags here..." value="" />
+                    <div class="help-block"></div>
+                </div>
+                <button type="submit">Send</button>
+            </form>
         </div>
         <div class="col-md-3">&nbsp;</div>
     </div>
@@ -38,19 +46,34 @@
 <script type="text/javascript">
     $(document).ready(function () {
 
-        //$('input#tags').val('{"471":"some text","472":"some value","boo":"some value 2","foo":"some value 3","foo":"some value 4","foo":"some value 5"}');
-
-        var tags = $('input#tags').tagsinput({
-            "onBeforeInsert": function () {
-                console.log(this.index);
+        var tags = $('input#tags1').tagsinput({
+            autocomplete: false,
+            debug: true,
+            onChange: function() {
+                var $input = $(this.element());
+                $input.next('.help-block').text(this.value());
             }
         });
 
-        setInterval(function() {
-            console.log(tags.tagsinput('items'));
-            console.log($('input#tags').val());
-        }, 5000);
+        $('input#tags2').val('{"471":"some text","472":"some value","boo":"some value 2","foo":"some value 3","foo":"some value 4","foo":"some value 5"}');
+        var tags = $('input#tags2').tagsinput({
+            autocomplete: false,
+            debug: true,
+            onChange: function() {
+                var $input = $(this.element());
+                $input.next('.help-block').text(this.value());
+            }
+        });
 
+        $('input#tags3').val('{"UA": "Ukraine", "KZ":"Kazakhstan", "BY": "Belarus"}');
+        var tags = $('input#tags3').tagsinput({
+            autocomplete: './data.json',
+            debug: true,
+            onChange: function() {
+                var $input = $(this.element());
+                $input.next('.help-block').text(this.value());
+            }
+        });
     });
 </script>
 </body>
