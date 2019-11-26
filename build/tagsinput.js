@@ -2,7 +2,7 @@
  * Tags input for Bootstrap 3
  *
  * @category        jQuery Plugin
- * @version         1.0.1
+ * @version         1.0.2
  * @author          Alexsander Vyshnyvetskyy <alex.vyshnyvetskyy@gmail.com>
  * @link            https://github.com/wdmg/bootstrap-tagsinput
  * @copyright       Copyright (c) 2019 W.D.M.Group, Ukraine
@@ -47,6 +47,7 @@
             inputClass: '.tagsinput', // Input class
             labelClass: '.label .label-info', // Tag label class
             autocomplete: false, // Autocomplete URL
+            format: "string", // Input/output format
             minInput: 2, // Min input lenght
             maxTags: 10, // Max tags count
             templates: {
@@ -102,8 +103,8 @@
                 _this._$element.each(function() {
 
                     _this.tags = [];
-                    _this.format = "string";
                     _this.$input = $(this);
+                    _this._callbackInProcess = false;
 
                     // Build tags input widget
                     if (typeof _this.$input !== "undefined")
@@ -112,21 +113,28 @@
                     // Get values from original input and add them
                     var inputVal = _this.$input.val();
 
-                    // If the original value is parsed as an object
-                    try {
+                    // Get original value
+                    if (_this._config.format == "json") {
 
-                        _this.tags = {};
-                        _this.format = "json";
+                        // Try to parsing original value as object
+                        try {
 
-                        var tagsList = JSON.parse(inputVal.split(_this._config.delimiter));
-                        $.each(tagsList, function(i, tag) {
-                            _this.addTag(i, tag);
-                        });
+                            _this.tags = {};
 
-                    } catch(e) {
+                            var tagsList = JSON.parse(inputVal.split(_this._config.delimiter));
+                            $.each(tagsList, function(i, tag) {
+                                _this.addTag(i, tag);
+                            });
+
+                        } catch(e) {
+                            if (_this._config.debug)
+                                console.log('Error parsing original value in json', e);
+                        }
+                    }
+
+                    if (_this._config.format == "string") {
 
                         _this.tags = [];
-                        _this.format = "string";
 
                         var tagsList = inputVal.split(_this._config.delimiter);
                         if (tagsList.length > 0) {
@@ -134,7 +142,6 @@
                                 _this.addTag(tag);
                             });
                         }
-
                     }
 
                     // Update input value
@@ -190,6 +197,7 @@
 
                     // Remove tag
                     $('body').delegate('#' + _this._tagsListId + ' [data-dismiss="tag"]', 'click', function(event) {
+                        event.preventDefault();
                         var $target = $(event.target);
                         var value = $target.data('value');
                         if (_this.removeTag(value)) {
@@ -275,7 +283,7 @@
                         this.$input.data('tags', this.tags);
 
                         // Write values to original input for access via input.val()
-                        if (this.format == "json")
+                        if (this._config.format == "json")
                             this.$input.val(JSON.stringify(this.tags));
                         else
                             this.$input.val(this.tags.join(this._config.delimiter));
@@ -299,7 +307,7 @@
                         var _this = this;
                         var status = false;
                         if (value.length > 0) {
-                            if (_this.format == "json") {
+                            if (_this._config.format == "json") {
                                 $.each(this.tags, function(i, tag) {
                                     if (tag == value)
                                         delete _this.tags[i];
@@ -384,7 +392,7 @@
 
                         // If value not empty try to add them
                         if (value.length >= parseInt(this._config.minInput)) {
-                            if (this.format == "json") {
+                            if (this._config.format == "json") {
 
                                 // If value not present in tags collection
                                 if (typeof this.tags[index.toString()] == "undefined") {
@@ -432,101 +440,140 @@
                         return status;
                     }
                 },
+                parseURL: {
+                    value: function parseURL(url) {
+                        return JSON.parse('{"' + decodeURI(url).replace(/"/g, '\\"').replace(/&/g, '","').replace(/=/g,'":"') + '"}');
+                    }
+                },
+                encodeURL: {
+                    value: function encodeURL(object) {
+                        var url = "";
+                        for (var key in object) {
+                            if (url != "") {
+                                url += "&";
+                            }
+                            url += key + "=" + encodeURIComponent(object[key]);
+                        }
+                        return url;
+                    }
+                },
                 buildAutocomplete: {
                     value: function buildAutocomplete() {
                         var _this = this;
-                        var callbackInProcess = false;
+                        _this._callbackInProcess = false;
                         _this.$tagsInput.on('input', function (event) {
                             var value = event.target.value.trim();
-                            if (value.length >= parseInt(_this._config.minInput) && !callbackInProcess) {
-                                callbackInProcess = true;
-                                var url = _this._config.autocomplete + '?value=' + value + '&_t=' + Date.now();
-                                $.get(url).success(function(response) {
+                            if (value.length >= parseInt(_this._config.minInput) && !_this._callbackInProcess) {
+                                _this._callbackInProcess = true;
 
-                                    if (_this._config.onAutocompleteSuccess instanceof Object && _this._config.onAutocompleteSuccess instanceof Function) {
-                                        if (_this._config.debug)
-                                            console.log('Call `onAutocompleteSuccess` method', this);
+                                // Prepare URL for aJax and add value string
+                                var url = _this.parseURL(_this._config.autocomplete);
+                                url['value'] = value;
+                                url['_t'] = Date.now();
 
-                                        _this._config.onAutocompleteSuccess.call(this);
-                                    }
+                                $.ajax({
+                                    url: _this.encodeURL(url),
+                                    success: function(response, status, jqXHR) {
 
-                                    if (_this.format == "json" && response.length > 0) {
-
-                                        if (_this._config.onAutocompleteShow instanceof Object && _this._config.onAutocompleteShow instanceof Function) {
-                                            if (_this._config.debug)
-                                                console.log('Call `onAutocompleteShow` method', this);
-
-                                            _this._config.onAutocompleteShow.call(this);
-                                        }
-
-                                        if (!(typeof response == "object"))
+                                        if (_this._config.format == "json" && !(typeof response == "object"))
                                             response = JSON.parse(response);
 
-                                        _this.$autocomplete.empty();
-                                        $.each(response, function(index, tag) {
-
-                                            if (typeof tag == "object") {
-                                                $.each(tag, function(index, item) {
-                                                    tag = item;
-                                                });
-                                            }
-
-                                            if (tag.substr(0, value.length).toUpperCase() == value.toUpperCase()) {
-                                                var $autocompleteItem = $(_this._config.templates.autocompleteItem);
-                                                var $autocompleteLink = $autocompleteItem.find('a');
-                                                $autocompleteLink.html("<b>" + tag.substr(0, value.length) + "</b>" + tag.substr(value.length));
-                                                $autocompleteLink.data('index', index).data('value', tag);
-                                                $autocompleteLink.attr('href', '#'+index);
-                                                _this.$autocomplete.append($autocompleteItem);
-                                            }
-
-                                        });
-                                        _this.autocompleteShow();
-                                    } else if (response.length > 0) {
-
-                                        _this.$autocomplete.empty();
-
-                                        if (_this._config.onAutocompleteShow instanceof Object && _this._config.onAutocompleteShow instanceof Function) {
+                                        if (_this._config.onAutocompleteSuccess instanceof Object && _this._config.onAutocompleteSuccess instanceof Function) {
                                             if (_this._config.debug)
-                                                console.log('Call `onAutocompleteShow` method', this);
+                                                console.log('Call `onAutocompleteSuccess` method', this);
 
-                                            _this._config.onAutocompleteShow.call(this);
+                                            _this._config.onAutocompleteSuccess.call(this);
                                         }
 
-                                        for (var i = 0; i < response.length; i++) {
-                                            if (response[i].substr(0, value.length).toUpperCase() == value.toUpperCase()) {
-                                                var $autocompleteItem = $(_this._config.templates.autocompleteItem);
-                                                var $autocompleteLink = $autocompleteItem.find('a');
-                                                $autocompleteLink.html("<b>" + response[i].substr(0, value.length) + "</b>" + response[i].substr(value.length));
-                                                $autocompleteLink.data('value', response[i]);
-                                                _this.$autocomplete.append($autocompleteItem);
+                                        if (_this._config.format == "json" && Object.keys(response).length > 0) {
+
+                                            if (_this._config.onAutocompleteShow instanceof Object && _this._config.onAutocompleteShow instanceof Function) {
+                                                if (_this._config.debug)
+                                                    console.log('Call `onAutocompleteShow` method', this);
+
+                                                _this._config.onAutocompleteShow.call(this);
                                             }
+
+                                            _this.$autocomplete.empty();
+                                            $.each(response, function(index, tag) {
+
+                                                if (typeof tag == "object") {
+                                                    $.each(tag, function(index, item) {
+                                                        tag = item;
+                                                    });
+                                                }
+
+                                                if (tag.substr(0, value.length).toUpperCase() == value.toUpperCase()) {
+
+                                                    // If response tag not present in collection
+                                                    if (typeof _this.tags[index.toString()] == "undefined") {
+                                                        var $autocompleteItem = $(_this._config.templates.autocompleteItem);
+                                                        var $autocompleteLink = $autocompleteItem.find('a');
+                                                        $autocompleteLink.html("<b>" + tag.substr(0, value.length) + "</b>" + tag.substr(value.length));
+                                                        $autocompleteLink.data('index', index).data('value', tag);
+                                                        $autocompleteLink.attr('href', '#'+index);
+                                                        _this.$autocomplete.append($autocompleteItem);
+                                                    }
+
+                                                }
+
+                                            });
+                                            _this.autocompleteShow();
+                                        } else if (response.length > 0) {
+
+                                            _this.$autocomplete.empty();
+
+                                            if (_this._config.onAutocompleteShow instanceof Object && _this._config.onAutocompleteShow instanceof Function) {
+                                                if (_this._config.debug)
+                                                    console.log('Call `onAutocompleteShow` method', this);
+
+                                                _this._config.onAutocompleteShow.call(this);
+                                            }
+
+                                            for (var i = 0; i < response.length; i++) {
+
+                                                // If response tag not present in collection
+                                                if (response[i].substr(0, value.length).toUpperCase() == value.toUpperCase()) {
+                                                    if ($.inArray(value, _this.tags) == -1) {
+                                                        var $autocompleteItem = $(_this._config.templates.autocompleteItem);
+                                                        var $autocompleteLink = $autocompleteItem.find('a');
+                                                        $autocompleteLink.html("<b>" + response[i].substr(0, value.length) + "</b>" + response[i].substr(value.length));
+                                                        $autocompleteLink.data('value', response[i]);
+                                                        _this.$autocomplete.append($autocompleteItem);
+
+                                                    }
+                                                }
+
+                                            }
+                                            _this.autocompleteShow();
+                                        } else {
+                                            if (_this._config.onAutocompleteHide instanceof Object && _this._config.onAutocompleteHide instanceof Function) {
+                                                if (_this._config.debug)
+                                                    console.log('Call `onAutocompleteHide` method', this);
+
+                                                _this._config.onAutocompleteHide().call(this);
+                                            }
+                                            _this.autocompleteHide();
                                         }
-                                        _this.autocompleteShow();
-                                    } else {
-                                        if (_this._config.onAutocompleteHide instanceof Object && _this._config.onAutocompleteHide instanceof Function) {
+                                        _this._callbackInProcess = false;
+                                    },
+                                    error: function(jqXHR, status, error) {
+                                        if (_this._config.onAutocompleteError instanceof Object && _this._config.onAutocompleteError instanceof Function) {
                                             if (_this._config.debug)
-                                                console.log('Call `onAutocompleteHide` method', this);
+                                                console.log('Call `onAutocompleteError` method', this);
 
-                                            _this._config.onAutocompleteHide().call(this);
+                                            _this._config.onAutocompleteError.call(this);
                                         }
-                                        _this.autocompleteHide();
+                                        _this._callbackInProcess = false;
                                     }
-                                    callbackInProcess = false;
-                                }).error(function() {
-                                    if (_this._config.onAutocompleteError instanceof Object && _this._config.onAutocompleteError instanceof Function) {
-                                        if (_this._config.debug)
-                                            console.log('Call `onAutocompleteError` method', this);
-
-                                        _this._config.onAutocompleteError.call(this);
-                                    }
-                                    callbackInProcess = false;
                                 });
                             }
                         });
 
                         $('body').delegate('#autocomplete-' + _this._tagsListId + ' a', 'click', function(event) {
+
                             event.preventDefault();
+
                             _this.$tagsInput.val('');
                             var $target = $(event.target);
                             var index = $target.data('index');
@@ -548,6 +595,7 @@
                                 _this.autocompleteHide();
                                 _this.updateValues();
                             }
+
                         });
                     }
                 },
@@ -560,7 +608,7 @@
                             if (_this._config.debug)
                                 console.log('Call `onAutocompleteShown` method', this);
 
-                            _this._config.onAutocompleteShown.call(this); // 777
+                            _this._config.onAutocompleteShown.call(this);
                         }
                     }
                 },
