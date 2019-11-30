@@ -442,18 +442,36 @@
                 },
                 parseURL: {
                     value: function parseURL(url) {
-                        return JSON.parse('{"' + decodeURI(url).replace(/"/g, '\\"').replace(/&/g, '","').replace(/=/g,'":"') + '"}');
+                        var pattern = new RegExp(/[?&]\w+=/);
+                        if (pattern.test(url)) {
+                            return JSON.parse('{"' + decodeURIComponent(url).replace(/"/g, '\\"').replace(/&/g, '","').replace(/=/g, '":"') + '"}');
+                        } else {
+                            return JSON.parse('{"' + decodeURIComponent(url) + '":""}');
+                        }
                     }
                 },
                 encodeURL: {
                     value: function encodeURL(object) {
+
                         var url = "";
+                        var pattern = new RegExp(/[?&]\w+=/);
                         for (var key in object) {
-                            if (url != "") {
-                                url += "&";
+
+                            if (pattern.test(url)) {
+                                if (url != "")
+                                    url += "&";
+                            } else {
+                                if (url != "")
+                                    url += "?";
                             }
-                            url += key + "=" + encodeURIComponent(object[key]);
+
+                            if (key != "" && encodeURIComponent(object[key]) == "")
+                                url = key;
+                            else if (key != "" && encodeURIComponent(object[key]) != "")
+                                url += key + "=" + encodeURIComponent(object[key]);
+
                         }
+
                         return url;
                     }
                 },
