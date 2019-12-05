@@ -2,7 +2,7 @@
  * Tags input for Bootstrap 3
  *
  * @category        jQuery Plugin
- * @version         1.0.2
+ * @version         1.0.3
  * @author          Alexsander Vyshnyvetskyy <alex.vyshnyvetskyy@gmail.com>
  * @link            https://github.com/wdmg/bootstrap-tagsinput
  * @copyright       Copyright (c) 2019 W.D.M.Group, Ukraine
@@ -42,7 +42,7 @@
 
         // Public options and methods
         var defaults = {
-            id: null, // Delimiter for split tags
+            id: null, // Widget ID if need
             delimiter: ',', // Delimiter for split tags
             inputClass: '.tagsinput', // Input class
             labelClass: '.label .label-info', // Tag label class
