@@ -59,12 +59,12 @@ For example use the input-group:
 
 | Name                | Type   | Default value                                  | Description                                                |
 |:------------------- |:------:|:---------------------------------------------- |:---------------------------------------------------------- |
-| inputWrapper        | string | '<div class="bootstrap-tagsinput" />'          | Template for widget wrapper. |
-| inputField          | string | '<input type="text" autocomplete="false" />'   | The autocomplete field. |
-| tagItem             | string | '<span class="tag" />'                         | The tag template. |
-| tagRemoveLink       | string | '<a href="#" class="remove" data-dismiss="tag" aria-hidden="true">[x]</a>' | Link for remove tag. |
-| autocompleteList    | string | '<div class="autocomplete dropdown-menu" />'   | Autocomplete dropdown list. |
-| autocompleteItem    | string | '<li><a class="item" href="#" /></li>'         | Autocomplete dropdown item. |
+| inputWrapper        | string | `<div class="bootstrap-tagsinput" />`          | Template for widget wrapper. |
+| inputField          | string | `<input type="text" autocomplete="false" />`   | The autocomplete field. |
+| tagItem             | string | `<span class="tag" />`                         | The tag template. |
+| tagRemoveLink       | string | `<a href="#" class="remove" data-dismiss="tag" aria-hidden="true">[x]</a>` | Link for remove tag. |
+| autocompleteList    | string | `<div class="autocomplete dropdown-menu" />`   | Autocomplete dropdown list. |
+| autocompleteItem    | string | `<li><a class="item" href="#" /></li>`         | Autocomplete dropdown item. |
 
 # Status and version
 * v.1.0.3 - Added README.md
