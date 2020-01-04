@@ -7,7 +7,7 @@ module.exports = function(grunt) {
                     'build/tagsinput.js'
                 ],
                 dest: 'src/js/tagsinput.js'
-            },
+            }
         },
         uglify: {
             selectinput: {
@@ -18,7 +18,7 @@ module.exports = function(grunt) {
                 files: {
                     'src/js/tagsinput.min.js': ['build/tagsinput.js']
                 }
-            },
+            }
         },
         sass: {
             style: {
@@ -54,7 +54,7 @@ module.exports = function(grunt) {
                 tasks: ['concat', 'uglify'],
                 options: {
                     spawn: false
-                },
+                }
             },
             styles: {
                 files: ['build/tagsinput.scss'],
